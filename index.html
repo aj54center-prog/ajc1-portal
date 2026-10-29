@@ -1,0 +1,258 @@
+<!doctype html>
+<html lang="th">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>AJC1 Portal</title>
+<style>
+:root{--navy:#123052;--blue:#1f6fb2;--cyan:#3ba8c9;--ink:#17324d;--muted:#6c7f91;--bg:#eef4f8;--card:#fff;--line:#dbe6ee;--shadow:0 18px 45px rgba(25,55,80,.10)}
+*{box-sizing:border-box}body{margin:0;font-family:"Segoe UI","Noto Sans Thai",Tahoma,sans-serif;background:linear-gradient(145deg,#eef5f9,#f8fbfd);color:var(--ink)}
+.root{min-height:100vh}.hero{background:linear-gradient(135deg,#0e2947,#16466f 58%,#237b9c);color:white;padding:30px 6vw 54px;position:relative;overflow:hidden}.hero:after{content:"";position:absolute;width:420px;height:420px;border-radius:50%;right:-120px;top:-180px;background:rgba(255,255,255,.08)}
+.top{max-width:1180px;margin:auto;display:flex;justify-content:space-between;align-items:center;position:relative;z-index:1}.brand{display:flex;align-items:center;gap:13px}.logo{width:48px;height:48px;border-radius:14px;background:rgba(255,255,255,.15);display:grid;place-items:center;font-size:25px;border:1px solid rgba(255,255,255,.22)}.brand b{font-size:23px;letter-spacing:.5px}.brand span{display:block;font-size:12px;opacity:.78;margin-top:2px}.date{font-size:13px;opacity:.86}
+.hero-main{max-width:1180px;margin:48px auto 0;position:relative;z-index:1}.eyebrow{font-size:12px;letter-spacing:2px;text-transform:uppercase;opacity:.72}.hero h1{font-size:clamp(31px,4vw,48px);margin:10px 0 12px;line-height:1.15}.hero p{margin:0;max-width:690px;font-size:16px;line-height:1.8;opacity:.86}
+.content{max-width:1180px;margin:-28px auto 0;padding:0 20px 12px;position:relative;z-index:2}.section-head{display:flex;justify-content:space-between;align-items:end;margin:0 0 18px;padding:0 3px}.section-head h2{margin:0;font-size:21px}.section-head small{color:var(--muted)}
+.grid{display:grid;grid-template-columns:repeat(2,1fr);gap:18px}.card{background:var(--card);border:1px solid var(--line);border-radius:22px;padding:24px;box-shadow:var(--shadow);display:flex;gap:18px;align-items:flex-start;transition:.22s;cursor:pointer}.card:hover{transform:translateY(-4px);box-shadow:0 22px 50px rgba(25,55,80,.15);border-color:#bcd3e3}.icon{width:58px;height:58px;border-radius:17px;display:grid;place-items:center;font-size:28px;flex:none;background:#eaf4fb}.card h3{margin:2px 0 6px;font-size:19px}.card p{margin:0;color:var(--muted);font-size:13.5px;line-height:1.65}.arrow{margin-left:auto;color:var(--blue);font-size:22px;padding-top:2px}.tag{display:inline-block;margin-top:12px;padding:5px 9px;border-radius:999px;background:#eef6fb;color:#2871a4;font-size:11px;font-weight:700}
+.quick{margin-top:28px;background:#fff;border:1px solid var(--line);border-radius:22px;padding:20px 22px;box-shadow:0 12px 30px rgba(25,55,80,.06)}.quick h3{margin:0 0 14px;font-size:16px}.quick-row{display:flex;gap:10px;flex-wrap:wrap}.quick button{border:1px solid var(--line);background:#f9fcfe;color:var(--ink);padding:10px 14px;border-radius:12px;cursor:pointer;font-family:inherit}.quick button:hover{background:#eef6fb;border-color:#bcd3e3}
+.footer{text-align:center;color:#8293a1;font-size:12px;line-height:1.4;padding:4px 20px 10px;margin-top:0}
+.footer > div,.footer > strong,.footer > small{display:block;margin:0;width:100%}
+.footer strong{color:#344563;font-size:13px;font-weight:600;margin-top:1px}
+.footer small{color:#8293a1;font-size:11px;line-height:1.4;margin-top:1px}.toast{position:fixed;left:50%;bottom:25px;transform:translate(-50%,20px);opacity:0;background:#17324d;color:#fff;padding:11px 16px;border-radius:12px;font-size:13px;transition:.25s;pointer-events:none}.toast.show{opacity:1;transform:translate(-50%,0)}
+@media(max-width:720px){.hero{padding:22px 20px 48px}.top{align-items:flex-start}.date{display:none}.hero-main{margin-top:38px}.content{padding:0 14px 35px}.grid{grid-template-columns:1fr}.card{padding:19px;border-radius:18px}.icon{width:52px;height:52px}.section-head{align-items:start;gap:8px;flex-direction:column}.hero h1{font-size:34px}}
+
+.modal-backdrop{display:none;position:fixed;inset:0;background:rgba(7,25,43,.58);backdrop-filter:blur(5px);z-index:1000;padding:20px;align-items:center;justify-content:center}
+.modal-backdrop.show{display:flex}.modal{position:relative;background:#fff;width:min(100%,560px);max-height:90vh;overflow:auto;border-radius:24px;padding:28px;box-shadow:0 24px 80px rgba(0,0,0,.25)}
+.modal-close{position:absolute;right:14px;top:12px;border:0;background:#eef4f8;border-radius:50%;width:35px;height:35px;font-size:24px;cursor:pointer}
+.modal-icon{width:54px;height:54px;border-radius:16px;display:grid;place-items:center;background:#eaf4fb;font-size:27px;margin-bottom:14px}
+.modal h2{font-size:21px;line-height:1.5;margin:0 35px 7px 0;color:var(--navy)}.modal-subtitle{color:var(--muted);font-size:14px;margin:0 0 18px}
+.option-card{display:flex;align-items:center;gap:12px;width:100%;text-align:left;border:1px solid var(--line);background:#fbfdff;border-radius:15px;padding:15px;margin-top:10px;cursor:pointer;color:var(--ink);font-family:inherit}
+.option-card:hover{border-color:#8ab8d5;background:#f1f8fc}.option-icon{width:42px;height:42px;display:grid;place-items:center;flex:none;background:#eaf4fb;border-radius:12px;font-size:21px}
+.option-card b{display:block;font-size:14px;line-height:1.6}.option-card small{display:block;color:var(--muted);font-size:12px;margin-top:3px}.option-arrow{margin-left:auto;font-size:24px;color:var(--blue)}
+.modal form label{display:block;font-size:13px;font-weight:700;margin:12px 0 6px;color:#29465f}
+.modal form input:not([type=file]),.modal form textarea{width:100%;border:1px solid #cedde7;border-radius:10px;padding:11px;font:inherit;font-size:14px}
+.modal form input[type=file]{width:100%;font-size:13px}.primary-btn{margin-top:17px;width:100%;border:0;border-radius:12px;background:linear-gradient(135deg,#1f6fb2,#237b9c);color:white;padding:13px;font:inherit;font-weight:700;cursor:pointer}
+.login-hint{font-size:12px;color:#8a6b35;background:#fff8e8;padding:10px;border-radius:10px;line-height:1.6;margin-top:12px}.form-modal{width:min(100%,650px)}
+.change-grid{display:grid;grid-template-columns:1fr 1fr;gap:0 14px}.change-grid .full{grid-column:1/-1}.change-note{font-size:12px;color:#6c7f91;background:#f2f7fa;padding:11px;border-radius:10px;line-height:1.7}@media(max-width:520px){.change-grid{grid-template-columns:1fr}.change-grid .full{grid-column:auto}}
+.developer-credit{margin-top:18px;padding-top:13px;border-top:1px solid #e8edf4;text-align:center;color:#8293a1;font-size:12px;line-height:1.8}.developer-credit strong{display:block;color:#344563;font-size:13px;font-weight:600}.developer-credit small{display:block;font-size:11px;line-height:1.7}
+@media(max-width:520px){.modal{padding:22px 17px}.modal h2{font-size:19px}.option-card{padding:12px;gap:9px}.option-card b{font-size:13px}}
+
+
+</style>
+</head>
+<body>
+<div class="root">
+<header class="hero">
+  <div class="top"><div class="brand"><div class="logo">🏢</div><div><b>AJC1</b><span>ระบบบริหารพัสดุและทรัพย์สิน</span></div></div><div class="date" id="date"></div></div>
+  <div class="hero-main"><div class="eyebrow">AJC1 MANAGEMENT PORTAL</div><h1>ยินดีต้อนรับเข้าสู่ระบบ แผนกบริหารพัสดุและบริหารทรัพย์สิน (AJC1) </h1><p>ศูนย์รวมการทำงานด้านพัสดุ สัญญา และทรัพย์สิน เพื่อให้การติดตามและดำเนินงานเป็นเรื่องง่ายในที่เดียว</p></div>
+</header>
+<main class="content">
+  <div class="section-head"><h2>เมนูระบบ</h2><small>เลือกเมนูที่ต้องการใช้งาน</small></div>
+  <section class="grid">
+    <article class="card" onclick="openMenu(1)"><div class="icon">📑</div><div><h3>เมนูที่ 1</h3><p>ทะเบียนสัญญางบลงทุน</p><span class="tag">เข้าใช้งาน</span></div><div class="arrow">›</div></article>
+    <article class="card" onclick="openMenu(2)"><div class="icon">🔔</div><div><h3>เมนูที่ 2</h3><p>ทะเบียนควบคุมสัญญางบลงทุน</p><span class="tag">ติดตามสัญญา</span></div><div class="arrow">›</div></article>
+    <article class="card" onclick="openMenu(3)"><div class="icon">🔔</div><div><h3>เมนูที่ 3</h3><p>ตรวจสอบความชำรุดบกพร่องของสัญญา</p><span class="tag">ตรวจสอบ</span></div><div class="arrow">›</div></article>
+    <article class="card" onclick="openStickerMenu()"><div class="icon">📋</div><div><h3>เมนูที่ 4</h3><p>ขอสติ๊กเกอร์บาร์โค้ดทรัพย์สิน</p><span class="tag">ขอสติ๊กเกอร์บาร์โค้ด</span></div><div class="arrow">›</div></article>
+  </section>
+  <section class="quick"><h3>⚡ การเข้าถึงด่วน</h3><div class="quick-row"><button onclick="openMenu(2)">🔔 ติดตามสัญญา</button><button onclick="openMenu(3)">🏷️ ตรวจสอบความชำรุดบกพร่องของสัญญาครบค้ำประกัน</button><button onclick="openDashboardMenu()">📊 รายงาน / Dashboard</button></div></section>
+</main>
+<footer class="footer">
+  <div>พัฒนาระบบโดย</div>
+  <strong>นางสาวปฐมาวดี ปรีชา</strong>
+  <small>แผนกบริหารพัสดุและบริหารทรัพย์สิน | เจ้าหน้าที่พัสดุ 4</small>
+</footer>
+
+
+<div class="modal-backdrop" id="developmentModal" role="dialog" aria-modal="true" onclick="if(event.target===this)closeDevelopmentModal()">
+ <div class="modal" style="max-width:420px;text-align:center">
+  <button class="modal-close" onclick="closeDevelopmentModal()" aria-label="ปิด">×</button>
+  <div class="modal-icon" style="margin:0 auto 14px">🚧</div>
+  <h2 style="margin-right:0">รอพัฒนาระบบ</h2>
+  <p class="modal-subtitle" style="margin-bottom:20px">เมนูนี้อยู่ระหว่างการพัฒนาระบบ</p>
+  <button class="primary-btn" style="margin-top:0" onclick="closeDevelopmentModal()">ตกลง</button>
+ </div>
+</div>
+
+<div class="modal-backdrop" id="dashboardMenuModal" role="dialog" aria-modal="true" onclick="if(event.target===this)closeDashboardMenu()">
+ <div class="modal"><button class="modal-close" onclick="closeDashboardMenu()" aria-label="ปิด">×</button>
+  <div class="modal-icon">📊</div><h2>เลือก Dashboard ที่ต้องการดู</h2><p class="modal-subtitle">เลือกตามเมนูหลักของระบบ AJC1</p>
+  <button class="option-card" onclick="openDashboardChoice(1)"><span class="option-icon">📑</span><span><b>Dashboard เมนูที่ 1</b><small>ทะเบียนสัญญางบลงทุน</small></span><span class="option-arrow">›</span></button>
+  <button class="option-card" onclick="openDashboardChoice(2)"><span class="option-icon">🔔</span><span><b>Dashboard เมนูที่ 2</b><small>ทะเบียนควบคุมสัญญางบลงทุน</small></span><span class="option-arrow">›</span></button>
+  <button class="option-card" onclick="openDashboardChoice(3)"><span class="option-icon">🛠️</span><span><b>Dashboard เมนูที่ 3</b><small>ตรวจสอบความชำรุดบกพร่องของสัญญาค้ำประกัน</small></span><span class="option-arrow">›</span></button>
+  <button class="option-card" onclick="openDashboardChoice(4)"><span class="option-icon">🏷️</span><span><b>Dashboard เมนูที่ 4</b><small>สรุปการขอสติ๊กเกอร์บาร์โค้ดทรัพย์สิน</small></span><span class="option-arrow">›</span></button>
+ </div>
+</div>
+
+<div class="modal-backdrop" id="stickerMenuModal" role="dialog" aria-modal="true" onclick="if(event.target===this)closeStickerMenu()">
+ <div class="modal"><button class="modal-close" onclick="closeStickerMenu()" aria-label="ปิด">×</button>
+  <div class="modal-icon">🏷️</div><h2>กรุณาเลือกเมนูที่ต้องการขอสติ๊กเกอร์</h2><p class="modal-subtitle">เลือกประเภทคำขอที่ต้องการ</p>
+  <button class="option-card" onclick="requireLogin('new')"><span class="option-icon">🆕</span><span><b>ขอสติ๊กเกอร์บาร์โค้ดทรัพย์ใหม่</b><small>สำหรับทรัพย์สินใหม่</small></span><span class="option-arrow">›</span></button>
+  <button class="option-card" onclick="requireLogin('transferred')"><span class="option-icon">🔄</span><span><b>ขอสติ๊กเกอร์บาร์โค้ดทรัพย์สินที่ทำการโอน</b><small>สำหรับทรัพย์สินที่ทำการโอน</small></span><span class="option-arrow">›</span></button>
+  <button class="option-card" onclick="openChoice('damaged')"><span class="option-icon">🛠️</span><span><b>ขอสติ๊กเกอร์บาร์โค้ดชำรุด</b><small>สำหรับสติ๊กเกอร์ที่เกิดการชำรุดหรือสูญหาย</small></span><span class="option-arrow">›</span></button>
+  <button class="option-card" onclick="openDepartmentChange()"><span class="option-icon">🏢</span><span><b>แจ้งเปลี่ยนแปลงข้อมูลหน่วยงาน</b><small>แจ้งเปลี่ยนรหัส เปลี่ยนชื่อ หรือปรับโครงสร้างหน่วยงาน</small></span><span class="option-arrow">›</span></button>
+ </div>
+</div>
+<div class="modal-backdrop" id="departmentChangeModal" role="dialog" aria-modal="true" onclick="if(event.target===this)closeDepartmentChange()">
+ <div class="modal form-modal"><button class="modal-close" onclick="closeDepartmentChange()" aria-label="ปิด">×</button><div class="modal-icon">🏢</div>
+  <h2>แจ้งเปลี่ยนแปลงข้อมูลหน่วยงาน</h2><p class="modal-subtitle">กรอกข้อมูลเพื่อให้เจ้าหน้าที่ปรับปรุงข้อมูลติดต่อหน่วยงาน</p>
+  <form id="departmentChangeForm" onsubmit="submitDepartmentChange(event)">
+   <div class="change-grid">
+    <div><label for="oldDeptName">ชื่อหน่วยงานเดิม</label><input id="oldDeptName" required placeholder="ระบุชื่อหน่วยงานเดิม"></div>
+    <div><label for="oldDeptCode">รหัสหน่วยงานเดิม</label><input id="oldDeptCode" required placeholder="ระบุรหัสเดิม"></div>
+    <div><label for="newDeptName">ชื่อหน่วยงานใหม่</label><input id="newDeptName" required placeholder="ระบุชื่อหน่วยงานใหม่"></div>
+    <div><label for="newDeptCode">รหัสหน่วยงานใหม่</label><input id="newDeptCode" required placeholder="ระบุรหัสใหม่"></div>
+    <div><label for="changeEffectiveDate">วันที่มีผลเปลี่ยนแปลง</label><input id="changeEffectiveDate" type="date"></div>
+    <div><label for="sameContact">ผู้ประสานงานเป็นคนเดิมหรือไม่</label><select id="sameContact" required><option value="">เลือกคำตอบ</option><option value="คนเดิม">เป็นคนเดิม</option><option value="คนใหม่">เปลี่ยนผู้ประสานงาน</option></select></div>
+    <div id="newContactNameWrap"><label for="contactName">ชื่อผู้ประสานงานคนใหม่</label><input id="contactName" placeholder="ชื่อ-นามสกุล"></div>
+    <div><label for="contactLine">ชื่อ LINE / IDLINE</label><input id="contactLine" placeholder="ชื่อ LINE หรือรหัสที่ใช้แสดง"></div>
+    <div id="newContactPhoneWrap"><label for="contactPhone">เบอร์ติดต่อผู้ประสานงานคนใหม่</label><input id="contactPhone" type="tel" placeholder="เบอร์โทรศัพท์"></div>
+    <div id="newContactEmailWrap"><label for="contactEmail">อีเมลผู้ประสานงานคนใหม่ (ถ้ามี)</label><input id="contactEmail" type="email" placeholder="อีเมลติดต่อ"></div>
+   </div>
+   <p class="change-note">ข้อมูลนี้จัดทำเพื่อบันทึกประวัติการเปลี่ยนแปลงหน่วยงานแยกจากข้อมูลคำขอสติ๊กเกอร์ </p>
+   <button class="primary-btn" type="submit">ตรวจสอบและบันทึกข้อมูล</button>
+   <div class="developer-credit">
+    <div>พัฒนาระบบโดย</div>
+    <strong>นางสาวปฐมาวดี ปรีชา</strong>
+    <small>แผนกบริหารพัสดุและบริหารทรัพย์สิน | เจ้าหน้าที่พัสดุ 4</small>
+   </div>
+  </form>
+ </div>
+</div>
+<div class="modal-backdrop" id="loginModal" role="dialog" aria-modal="true" onclick="if(event.target===this)closeLogin()">
+ <div class="modal"><button class="modal-close" onclick="closeLogin()" aria-label="ปิด">×</button><div class="modal-icon">🔐</div>
+  <h2>ยืนยันตัวตนก่อนเข้าใช้งาน</h2><p class="modal-subtitle">กรุณากรอกรหัส Login code</p>
+  <form onsubmit="submitLogin(event)"><label for="loginCode">Login code</label><input id="loginCode" type="password" autocomplete="off" placeholder="กรอกรหัส Login code" required>
+  <p class="login-hint">กรอกรหัส Login code ที่ได้รับเพื่อเข้าใช้งาน</p><button class="primary-btn" type="submit">ยืนยันและเข้าใช้งาน</button></form>
+ </div>
+</div>
+<div class="modal-backdrop" id="requestFormModal" role="dialog" aria-modal="true" onclick="if(event.target===this)closeRequestForm()">
+ <div class="modal form-modal"><button class="modal-close" onclick="closeRequestForm()" aria-label="ปิด">×</button><div class="modal-icon">📝</div>
+  <h2 id="requestFormTitle">แบบฟอร์มขอสติ๊กเกอร์บาร์โค้ด</h2><p class="modal-subtitle">กรอกข้อมูลคำขอให้ครบถ้วน</p>
+  <form onsubmit="submitPrototypeForm(event)">
+   <label for="department">หน่วยงาน</label><input id="department" required placeholder="ระบุหน่วยงาน">
+   <label for="departmentCode">รหัสหน่วยงาน</label><input id="departmentCode" required placeholder="ระบุรหัสหน่วยงาน">
+   <label for="assetCode">รหัสทรัพย์สิน (ถ้ามี)</label><input id="assetCode" placeholder="ระบุรหัสทรัพย์สิน">
+   <label for="assetName">ชื่อทรัพย์สิน</label><input id="assetName" required placeholder="ระบุชื่อทรัพย์สิน">
+   <label for="receiver">ผู้รับสติ๊กเกอร์</label><input id="receiver" required placeholder="ชื่อผู้รับสติ๊กเกอร์">
+   <label for="receiverPhone">เบอร์ติดต่อผู้รับสติ๊กเกอร์</label><input id="receiverPhone" type="tel" required placeholder="เบอร์ติดต่อ">
+   <label for="signer">ผู้ลงชื่อ</label><input id="signer" required placeholder="ชื่อผู้ลงชื่อ">
+   <label for="signerPosition">ตำแหน่งผู้ลงชื่อ</label><input id="signerPosition" required placeholder="ตำแหน่ง">
+   <label for="requestReason">รายละเอียด/เหตุผลที่ขอ</label><textarea id="requestReason" rows="3" required placeholder="ระบุรายละเอียดคำขอ"></textarea>
+   <label for="attachment">แนบรูปหรือเอกสาร (ถ้ามี)</label><input id="attachment" type="file" accept="image/*,.pdf">
+   <p class="login-hint">ต้นแบบนี้ยังไม่บันทึกลง Google Sheet และยังไม่ส่งแจ้งเตือน</p><button class="primary-btn" type="submit">ตรวจสอบข้อมูล</button>
+  </form>
+ </div>
+</div>
+
+</div>
+<script>
+const LOGIN_CODE = 'AJC1__8395';
+const CHOICE_URLS = {
+  new: './sticker_menu_4_choice_1.html',
+  transferred: './sticker_menu_4_choice_2.html',
+  damaged: './sticker_menu_4_choice_3.html'
+};
+const MENU4_URL = CHOICE_URLS.damaged + '#barcode';
+
+const DASHBOARD_URL = 'https://script.google.com/macros/s/AKfycbySV4jyAtWOOt58JHMXRZpq-BebWmUxzEN80BUjtIDPL3QT8-fsBsHiOqrjCb7I3Xv00Q/exec';
+function openDashboardMenu(){document.getElementById('dashboardMenuModal').classList.add('show')}
+function closeDashboardMenu(){document.getElementById('dashboardMenuModal').classList.remove('show')}
+function openDashboardChoice(n){
+  closeDashboardMenu();
+  if(n===4){window.open(DASHBOARD_URL,'_blank','noopener');return;}
+  showToast('Dashboard เมนูที่ '+n+' ยังไม่ได้เชื่อมต่อ URL');
+}
+
+const urls={1:'',2:'',3:'',4:MENU4_URL};
+function openMenu(n){
+  if(n===4){ location.href=MENU4_URL; return; }
+  if(urls[n]){ location.href=urls[n]; return; }
+  if([1,2,3].includes(n)){ showDevelopmentModal(); return; }
+}
+function showDevelopmentModal(){document.getElementById('developmentModal').classList.add('show')}
+function closeDevelopmentModal(){document.getElementById('developmentModal').classList.remove('show')}
+function openStickerMenu(){document.getElementById('stickerMenuModal').classList.add('show')}
+function closeStickerMenu(){document.getElementById('stickerMenuModal').classList.remove('show')}
+let selectedRequestType='';
+function requireLogin(type){selectedRequestType=type;closeStickerMenu();document.getElementById('loginCode').value='';document.getElementById('loginModal').classList.add('show')}
+function openChoice(type){ location.href = CHOICE_URLS[type]; }
+function closeLogin(){document.getElementById('loginModal').classList.remove('show')}
+function submitLogin(event){
+  event.preventDefault();
+  const enteredCode = document.getElementById('loginCode').value;
+  if (enteredCode !== LOGIN_CODE) {
+    showToast('Login code ไม่ถูกต้อง กรุณาลองอีกครั้ง');
+    document.getElementById('loginCode').focus();
+    return;
+  }
+  const destination = CHOICE_URLS[selectedRequestType];
+  if (!destination) { showToast('ไม่พบหน้าทางเลือกที่ต้องการ'); return; }
+  closeLogin();
+  // เปิดหน้า HTML ของทางเลือกที่เลือก โดยไฟล์ปลายทางต้องอยู่โฟลเดอร์เดียวกับ Index
+  location.href = destination;
+}
+function closeRequestForm(){document.getElementById('requestFormModal').classList.remove('show')}
+function openDepartmentChange(){closeStickerMenu();document.getElementById('departmentChangeModal').classList.add('show')}
+function closeDepartmentChange(){document.getElementById('departmentChangeModal').classList.remove('show')}
+const DEPARTMENT_CHANGE_API_URL = 'https://script.google.com/macros/s/AKfycbwThaRpyF8h2rHFtgur-RPvXaYncoIMouJuNNyCT_TyVh0IRjIMscrsVkelhpZRdq3d/exec';
+function updateContactFields(){
+  const isNew = document.getElementById('sameContact').value === 'คนใหม่';
+  ['newContactNameWrap','newContactPhoneWrap','newContactEmailWrap'].forEach(id => {
+    document.getElementById(id).style.display = isNew ? '' : 'none';
+  });
+  document.getElementById('contactName').required = isNew;
+  document.getElementById('contactPhone').required = false;
+  document.getElementById('contactEmail').required = false;
+  if (!isNew) {
+    document.getElementById('contactName').value = '';
+    document.getElementById('contactPhone').value = '';
+    document.getElementById('contactEmail').value = '';
+  }
+}
+document.getElementById('sameContact').addEventListener('change', updateContactFields);
+updateContactFields();
+async function submitDepartmentChange(event){
+  event.preventDefault();
+  const form = document.getElementById('departmentChangeForm');
+  const submitButton = form.querySelector('button[type="submit"]');
+  const isNew = document.getElementById('sameContact').value === 'คนใหม่';
+  const payload = {
+    action: 'submitDepartmentChange',
+    old_department_name: document.getElementById('oldDeptName').value.trim(),
+    old_department_code: document.getElementById('oldDeptCode').value.trim(),
+    new_department_name: document.getElementById('newDeptName').value.trim(),
+    new_department_code: document.getElementById('newDeptCode').value.trim(),
+    effective_date: document.getElementById('changeEffectiveDate').value,
+    contact_status: document.getElementById('sameContact').value,
+    new_contact_name: isNew ? document.getElementById('contactName').value.trim() : '',
+    line_display_name: document.getElementById('contactLine').value.trim(),
+    new_contact_phone: isNew ? document.getElementById('contactPhone').value.trim() : '',
+    new_contact_email: isNew ? document.getElementById('contactEmail').value.trim() : ''
+  };
+  submitButton.disabled = true;
+  submitButton.textContent = 'กำลังส่งข้อมูล...';
+  try {
+    // ใช้ text/plain และ no-cors เพื่อส่งจากไฟล์ HTML ที่เปิดในเครื่องไปยัง Apps Script
+    // เบราว์เซอร์จะไม่เปิดเผยคำตอบกลับ จึงต้องตรวจสอบแถวใหม่ใน Google Sheets หลังส่ง
+    await fetch(DEPARTMENT_CHANGE_API_URL, {
+      method: 'POST',
+      mode: 'no-cors',
+      headers: {'Content-Type': 'text/plain;charset=utf-8'},
+      body: JSON.stringify(payload)
+    });
+    showToast('ส่งคำขอแล้ว กรุณาตรวจสอบข้อมูลใน Google Sheets');
+    form.reset();
+    updateContactFields();
+    setTimeout(closeDepartmentChange, 1200);
+  } catch (error) {
+    showToast('ส่งข้อมูลไม่สำเร็จ กรุณาตรวจสอบอินเทอร์เน็ตแล้วลองใหม่');
+    console.error('Department change submission failed:', error);
+  } finally {
+    submitButton.disabled = false;
+    submitButton.textContent = 'ตรวจสอบและบันทึกข้อมูล';
+  }
+}
+function submitPrototypeForm(event){event.preventDefault();showToast('ตรวจสอบข้อมูลแล้ว แต่ยังไม่บันทึก เนื่องจากยังไม่เชื่อมต่อ API')}
+function showToast(t){const e=document.getElementById('toast');e.textContent=t;e.classList.add('show');clearTimeout(window.tt);window.tt=setTimeout(()=>e.classList.remove('show'),2200)}
+const d=new Date();document.getElementById('date').textContent=d.toLocaleDateString('th-TH',{day:'numeric',month:'long',year:'numeric'});
+</script>
+</body>
+</html>
