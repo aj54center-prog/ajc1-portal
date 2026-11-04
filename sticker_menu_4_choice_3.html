@@ -1619,6 +1619,40 @@ table td:nth-child(10) {
   border-bottom:1px dashed #e2e8e8;
 }
 </style>
+
+<!-- LIFF: capture LINE User ID for damaged-sticker requests (menu 4, choice 3) -->
+<script src="https://static.line-scdn.net/liff/edge/2/sdk.js"></script>
+<script>
+const AJC1_LIFF_ID = "201230635-2yF1bRNW";
+let ajc1LiffReady = false;
+
+async function initAJC1Liff() {
+  try {
+    await liff.init({ liffId: AJC1_LIFF_ID });
+    ajc1LiffReady = true;
+  } catch (error) {
+    console.error("LIFF initialization failed:", error);
+  }
+}
+
+async function getAJC1LineUserId() {
+  if (!ajc1LiffReady) {
+    await initAJC1Liff();
+  }
+  if (!liff.isLoggedIn()) {
+    liff.login({ redirectUri: window.location.href });
+    throw new Error("กรุณาเข้าสู่ระบบ LINE แล้วกดส่งคำขออีกครั้งค่ะ");
+  }
+  const profile = await liff.getProfile();
+  if (!profile || !profile.userId) {
+    throw new Error("ไม่สามารถอ่าน LINE User ID ได้ กรุณาลองใหม่ค่ะ");
+  }
+  return profile.userId;
+}
+
+document.addEventListener("DOMContentLoaded", initAJC1Liff);
+</script>
+
 </head>
 
 <body>
@@ -1641,7 +1675,7 @@ table td:nth-child(10) {
 
     </div>
 
-    <a class="back-home-button" href="index_ajc1_sticker_menu_choices_1_2_3_login.html" aria-label="กลับหน้าหลัก">
+    <a class="back-home-button" href="index.html" aria-label="กลับหน้าหลัก">
         <span aria-hidden="true">←</span> หน้าแรก
     </a>
 
@@ -4478,8 +4512,11 @@ async function submitBarcodeRequest() {
           : '...');
     }
 
+    const lineUserId = await getAJC1LineUserId();
+
     const payload = {
       action: 'barcodeRequest',
+      lineUserId: lineUserId,
       items: items,
       department: department,
       departmentCode: departmentCode,
