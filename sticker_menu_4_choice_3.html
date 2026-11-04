@@ -1,3 +1,4 @@
+```
 <!DOCTYPE html>
 <html lang="th">
 <head>
@@ -1624,25 +1625,25 @@ table td:nth-child(10) {
 <script src="https://static.line-scdn.net/liff/edge/2/sdk.js"></script>
 <script>
 const AJC1_LIFF_ID = "201230635-2yF1bRNW";
-let ajc1LiffReady = false;
+let ajc1LiffInitPromise = null;
 
-async function initAJC1Liff() {
-  try {
-    await liff.init({ liffId: AJC1_LIFF_ID });
-    ajc1LiffReady = true;
-  } catch (error) {
-    console.error("LIFF initialization failed:", error);
+// เริ่ม LIFF เพียงครั้งเดียว และรอให้ init เสร็จก่อนใช้งาน
+function initAJC1Liff() {
+  if (!ajc1LiffInitPromise) {
+    ajc1LiffInitPromise = liff.init({ liffId: AJC1_LIFF_ID });
   }
+  return ajc1LiffInitPromise;
 }
 
 async function getAJC1LineUserId() {
-  if (!ajc1LiffReady) {
-    await initAJC1Liff();
-  }
+  await initAJC1Liff();
+
   if (!liff.isLoggedIn()) {
+    // LIFF จะพาไปเข้าสู่ระบบและกลับมาหน้าฟอร์มเดิม ไม่ต้องโยน error
     liff.login({ redirectUri: window.location.href });
-    throw new Error("กรุณาเข้าสู่ระบบ LINE แล้วกดส่งคำขออีกครั้งค่ะ");
+    return null;
   }
+
   const profile = await liff.getProfile();
   if (!profile || !profile.userId) {
     throw new Error("ไม่สามารถอ่าน LINE User ID ได้ กรุณาลองใหม่ค่ะ");
@@ -1650,7 +1651,11 @@ async function getAJC1LineUserId() {
   return profile.userId;
 }
 
-document.addEventListener("DOMContentLoaded", initAJC1Liff);
+document.addEventListener("DOMContentLoaded", function () {
+  initAJC1Liff().catch(function (error) {
+    console.error("LIFF initialization failed:", error);
+  });
+});
 </script>
 
 </head>
@@ -4514,6 +4519,11 @@ async function submitBarcodeRequest() {
 
     const lineUserId = await getAJC1LineUserId();
 
+    // หากยังไม่ได้เข้าสู่ระบบ LIFF จะ redirect ไป login; หยุดก่อนส่งข้อมูล
+    if (!lineUserId) {
+      return;
+    }
+
     const payload = {
       action: 'barcodeRequest',
       lineUserId: lineUserId,
@@ -5311,3 +5321,4 @@ function parseThaiOrEnglishDate(value) {
 
 </body>
 </html>
+```
