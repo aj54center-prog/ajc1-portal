@@ -1638,15 +1638,22 @@ function initAJC1Liff() {
 async function getAJC1LineUserId() {
   await initAJC1Liff();
 
+  // ต้องเปิดผ่าน LIFF ในแอป LINE และให้ LIFF session พร้อมใช้งาน
+  // ไม่เรียก liff.login() เอง เพื่อไม่ให้ผู้ใช้ถูกบังคับ Login ซ้ำ
+  if (!liff.isInClient()) {
+    console.warn("เปิดแบบ Browser ปกติ ไม่สามารถอ่าน LINE User ID ได้");
+    return null;
+  }
+
   if (!liff.isLoggedIn()) {
-    // LIFF จะพาไปเข้าสู่ระบบและกลับมาหน้าฟอร์มเดิม ไม่ต้องโยน error
-    liff.login({ redirectUri: window.location.href });
+    console.warn("LIFF ยังไม่ authenticated; ข้ามการอ่าน User ID โดยไม่ redirect login");
     return null;
   }
 
   const profile = await liff.getProfile();
   if (!profile || !profile.userId) {
-    throw new Error("ไม่สามารถอ่าน LINE User ID ได้ กรุณาลองใหม่ค่ะ");
+    console.error("LIFF getProfile ไม่มี userId");
+    return null;
   }
   return profile.userId;
 }
