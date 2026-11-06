@@ -5,7 +5,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<title>ทะเบียนคุมสัญญา AJC1</title>
+<title>ขอสติ๊กเกอร์บาร์โค๊ดทรัพย์สินชำรุดAJC1</title>
 
 <style>
 
@@ -1658,11 +1658,9 @@ async function getAJC1LineUserId() {
   return profile.userId;
 }
 
-document.addEventListener("DOMContentLoaded", function () {
-  initAJC1Liff().catch(function (error) {
-    console.error("LIFF initialization failed:", error);
-  });
-});
+// ไม่เริ่ม LIFF ทันทีตอนเปิดหน้าแบบฟอร์ม
+// เพื่อป้องกัน LIFF เปลี่ยนเส้นทางระหว่างการเปิดหน้าจาก LINE OA
+// จะเริ่ม LIFF เมื่อผู้ใช้กดส่งคำขอและต้องอ่าน LINE User ID เท่านั้น
 </script>
 
 </head>
