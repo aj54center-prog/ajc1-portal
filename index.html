@@ -174,7 +174,13 @@ function openStickerMenu(){document.getElementById('stickerMenuModal').classList
 function closeStickerMenu(){document.getElementById('stickerMenuModal').classList.remove('show')}
 let selectedRequestType='';
 function requireLogin(type){selectedRequestType=type;closeStickerMenu();document.getElementById('loginCode').value='';document.getElementById('loginModal').classList.add('show')}
-function openChoice(type){ location.href = CHOICE_URLS[type]; }
+function openChoice(type){
+  if (type === 'damaged') {
+    location.href = MENU4_URL;
+    return;
+  }
+  location.href = CHOICE_URLS[type];
+}
 function closeLogin(){document.getElementById('loginModal').classList.remove('show')}
 function submitLogin(event){
   event.preventDefault();
