@@ -5,7 +5,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<title>ขอสติ๊กเกอร์บาร์โค๊ดทรัพย์สินชำรุดAJC1</title>
+<title>ทะเบียนคุมสัญญา AJC1</title>
 
 <style>
 
@@ -1621,46 +1621,19 @@ table td:nth-child(10) {
 }
 </style>
 
-<!-- LIFF: capture LINE User ID for damaged-sticker requests (menu 4, choice 3) -->
-<script src="https://static.line-scdn.net/liff/edge/2/sdk.js"></script>
+<!-- LINE User ID is initialized on index.html (the LIFF Endpoint) and passed through same-origin sessionStorage. -->
 <script>
-const AJC1_LIFF_ID = "2012360635-2yF1bRNW";
-let ajc1LiffInitPromise = null;
-
-// เริ่ม LIFF เพียงครั้งเดียว และรอให้ init เสร็จก่อนใช้งาน
-function initAJC1Liff() {
-  if (!ajc1LiffInitPromise) {
-    ajc1LiffInitPromise = liff.init({ liffId: AJC1_LIFF_ID });
-  }
-  return ajc1LiffInitPromise;
-}
+const AJC1_LINE_USER_KEY = 'ajc1_line_user_id';
 
 async function getAJC1LineUserId() {
-  await initAJC1Liff();
-
-  // ต้องเปิดผ่าน LIFF ในแอป LINE และให้ LIFF session พร้อมใช้งาน
-  // ไม่เรียก liff.login() เอง เพื่อไม่ให้ผู้ใช้ถูกบังคับ Login ซ้ำ
-  if (!liff.isInClient()) {
-    console.warn("เปิดแบบ Browser ปกติ ไม่สามารถอ่าน LINE User ID ได้");
+  try {
+    const userId = sessionStorage.getItem(AJC1_LINE_USER_KEY);
+    return userId && userId.trim() ? userId.trim() : null;
+  } catch (error) {
+    console.error('Cannot read AJC1 LINE User ID from sessionStorage:', error);
     return null;
   }
-
-  if (!liff.isLoggedIn()) {
-    console.warn("LIFF ยังไม่ authenticated; ข้ามการอ่าน User ID โดยไม่ redirect login");
-    return null;
-  }
-
-  const profile = await liff.getProfile();
-  if (!profile || !profile.userId) {
-    console.error("LIFF getProfile ไม่มี userId");
-    return null;
-  }
-  return profile.userId;
 }
-
-// ไม่เริ่ม LIFF ทันทีตอนเปิดหน้าแบบฟอร์ม
-// เพื่อป้องกัน LIFF เปลี่ยนเส้นทางระหว่างการเปิดหน้าจาก LINE OA
-// จะเริ่ม LIFF เมื่อผู้ใช้กดส่งคำขอและต้องอ่าน LINE User ID เท่านั้น
 </script>
 
 </head>
@@ -4524,8 +4497,15 @@ async function submitBarcodeRequest() {
 
     const lineUserId = await getAJC1LineUserId();
 
-    // หากยังไม่ได้เข้าสู่ระบบ LIFF จะ redirect ไป login; หยุดก่อนส่งข้อมูล
+    // User ID must have been captured on index.html before opening this child page.
+    // Do not initialize LIFF here: that can trigger navigation back to the LIFF Endpoint.
     if (!lineUserId) {
+      const message = 'ไม่พบ LINE User ID กรุณาปิดแบบฟอร์ม แล้วเปิดระบบใหม่จาก Rich Menu ใน LINE';
+      if (status) {
+        status.style.display = 'block';
+        status.textContent = '❌ ' + message;
+      }
+      alert(message);
       return;
     }
 
