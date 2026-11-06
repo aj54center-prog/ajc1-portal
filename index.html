@@ -5,6 +5,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <title>AJC1 Portal</title>
+<script src="https://static.line-scdn.net/liff/edge/2/sdk.js"></script>
 <style>
 :root{--navy:#123052;--blue:#1f6fb2;--cyan:#3ba8c9;--ink:#17324d;--muted:#6c7f91;--bg:#eef4f8;--card:#fff;--line:#dbe6ee;--shadow:0 18px 45px rgba(25,55,80,.10)}
 *{box-sizing:border-box}body{margin:0;font-family:"Segoe UI","Noto Sans Thai",Tahoma,sans-serif;background:linear-gradient(145deg,#eef5f9,#f8fbfd);color:var(--ink)}
@@ -145,6 +146,35 @@
 
 </div>
 <script>
+const AJC1_LIFF_ID = '2012360635-2yF1bRNW';
+const AJC1_LINE_USER_KEY = 'ajc1_line_user_id';
+let ajc1EndpointUserIdPromise = null;
+
+// LIFF initialization happens only on the configured LIFF Endpoint (index.html).
+// The child form page reads the User ID from sessionStorage and does not call liff.init again.
+function prepareAJC1LineUserId() {
+  if (!ajc1EndpointUserIdPromise) {
+    ajc1EndpointUserIdPromise = (async function () {
+      try {
+        if (!window.liff) throw new Error('ไม่พบ LIFF SDK');
+        await liff.init({ liffId: AJC1_LIFF_ID });
+        if (!liff.isLoggedIn()) return null;
+        const profile = await liff.getProfile();
+        const userId = profile && profile.userId ? profile.userId : null;
+        if (userId) sessionStorage.setItem(AJC1_LINE_USER_KEY, userId);
+        return userId;
+      } catch (error) {
+        console.error('AJC1 LIFF initialization/profile error:', error);
+        return null;
+      }
+    })();
+  }
+  return ajc1EndpointUserIdPromise;
+}
+
+// Start once while the user is on the LIFF Endpoint page.
+prepareAJC1LineUserId();
+
 const LOGIN_CODE = 'AJC1__8395';
 const CHOICE_URLS = {
   new: './sticker_menu_4_choice_1.html',
@@ -174,8 +204,14 @@ function openStickerMenu(){document.getElementById('stickerMenuModal').classList
 function closeStickerMenu(){document.getElementById('stickerMenuModal').classList.remove('show')}
 let selectedRequestType='';
 function requireLogin(type){selectedRequestType=type;closeStickerMenu();document.getElementById('loginCode').value='';document.getElementById('loginModal').classList.add('show')}
-function openChoice(type){
+async function openChoice(type){
   if (type === 'damaged') {
+    const userId = await prepareAJC1LineUserId();
+    if (!userId) {
+      showToast('ยังอ่าน LINE User ID ไม่สำเร็จ กรุณาปิดแล้วเปิดระบบจาก Rich Menu ใน LINE ใหม่อีกครั้ง');
+      return;
+    }
+    sessionStorage.setItem(AJC1_LINE_USER_KEY, userId);
     location.href = MENU4_URL;
     return;
   }
