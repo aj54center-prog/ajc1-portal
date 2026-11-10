@@ -4496,7 +4496,7 @@ async function submitBarcodeRequest() {
     // User ID must have been captured on index.html before opening this child page.
     // Do not initialize LIFF here: that can trigger navigation back to the LIFF Endpoint.
     if (!lineUserId) {
-      const message = 'ไม่พบ LINE User ID กรุณาปิดแบบฟอร์ม แล้วเปิดระบบใหม่จาก Rich Menu ใน LINE';
+      const message = 'ไม่พบข้อมูลยืนยันตัวตน LINE กรุณากลับไปหน้าแรก AJC1 แล้วเลือกเมนูขอสติ๊กเกอร์ชำรุดอีกครั้ง';
       if (status) {
         status.style.display = 'block';
         status.textContent = '❌ ' + message;
