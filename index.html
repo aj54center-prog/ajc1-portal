@@ -145,6 +145,7 @@
 </div>
 
 </div>
+<div id="toast" class="toast" role="status" aria-live="polite"></div>
 <script>
 const AJC1_LIFF_ID = '2012360635-2yF1bRNW';
 const AJC1_LINE_USER_KEY = 'ajc1_line_user_id';
@@ -158,7 +159,11 @@ function prepareAJC1LineUserId() {
       try {
         if (!window.liff) throw new Error('ไม่พบ LIFF SDK');
         await liff.init({ liffId: AJC1_LIFF_ID });
+
+        // ผู้ที่ยังไม่ Login จะยังไม่ถูกบังคับให้ Login ตอนเปิดหน้าแรก
+        // จะให้ Login เฉพาะเมื่อเลือกเมนูที่ต้องใช้ LINE User ID เท่านั้น
         if (!liff.isLoggedIn()) return null;
+
         const profile = await liff.getProfile();
         const userId = profile && profile.userId ? profile.userId : null;
         if (userId) sessionStorage.setItem(AJC1_LINE_USER_KEY, userId);
@@ -172,7 +177,7 @@ function prepareAJC1LineUserId() {
   return ajc1EndpointUserIdPromise;
 }
 
-// Start once while the user is on the LIFF Endpoint page.
+// เริ่มเตรียมข้อมูล LINE ไว้ล่วงหน้า แต่ไม่บังคับให้ผู้ใช้ Login ตอนเปิดหน้าแรก
 prepareAJC1LineUserId();
 
 const LOGIN_CODE = 'AJC1__8395';
@@ -182,6 +187,34 @@ const CHOICE_URLS = {
   damaged: './sticker_menu_4_choice_3.html'
 };
 const MENU4_URL = CHOICE_URLS.damaged + '#barcode';
+const AJC1_LOGIN_ACTION_PARAM = 'ajc1_after_line_login';
+
+// หลังกลับจากหน้า LINE Login ให้เปิดแบบฟอร์มที่ผู้ใช้เลือกไว้โดยอัตโนมัติ
+async function resumeAJC1ActionAfterLogin() {
+  const params = new URLSearchParams(window.location.search);
+  if (params.get(AJC1_LOGIN_ACTION_PARAM) !== 'damaged') return;
+
+  const userId = await prepareAJC1LineUserId();
+  if (userId) {
+    sessionStorage.setItem(AJC1_LINE_USER_KEY, userId);
+    params.delete(AJC1_LOGIN_ACTION_PARAM);
+    const cleanUrl = window.location.pathname +
+      (params.toString() ? '?' + params.toString() : '') +
+      window.location.hash;
+    history.replaceState(null, '', cleanUrl);
+    window.location.replace(MENU4_URL);
+    return;
+  }
+
+  // ล้างตัวแปรป้องกันการวนกลับไปหน้า Login ซ้ำไม่สิ้นสุด
+  params.delete(AJC1_LOGIN_ACTION_PARAM);
+  const cleanUrl = window.location.pathname +
+    (params.toString() ? '?' + params.toString() : '') +
+    window.location.hash;
+  history.replaceState(null, '', cleanUrl);
+  alert('เข้าสู่ระบบ LINE ไม่สำเร็จ กรุณาลองเลือกเมนูขอสติ๊กเกอร์ชำรุดอีกครั้ง');
+}
+resumeAJC1ActionAfterLogin();
 
 const DASHBOARD_URL = 'https://script.google.com/macros/s/AKfycbySV4jyAtWOOt58JHMXRZpq-BebWmUxzEN80BUjtIDPL3QT8-fsBsHiOqrjCb7I3Xv00Q/exec';
 function openDashboardMenu(){document.getElementById('dashboardMenuModal').classList.add('show')}
@@ -207,10 +240,28 @@ function requireLogin(type){selectedRequestType=type;closeStickerMenu();document
 async function openChoice(type){
   if (type === 'damaged') {
     const userId = await prepareAJC1LineUserId();
+
     if (!userId) {
-      showToast('ยังอ่าน LINE User ID ไม่สำเร็จ กรุณาปิดแล้วเปิดระบบจาก Rich Menu ใน LINE ใหม่อีกครั้ง');
+      // LINE ในแอปควร Login อยู่แล้ว หากเป็นเบราว์เซอร์ภายนอก/คอมพิวเตอร์
+      // ให้ไปยืนยันตัวตนผ่าน LINE Login แล้วกลับมาทำรายการเดิมต่อ
+      try {
+        if (!window.liff) throw new Error('ไม่พบ LIFF SDK');
+
+        if (liff.isInClient()) {
+          alert('ยังไม่สามารถอ่าน LINE User ID ได้ กรุณาปิดระบบแล้วเปิดใหม่จาก Rich Menu ใน LINE อีกครั้ง');
+          return;
+        }
+
+        const redirectUrl = new URL(window.location.href);
+        redirectUrl.searchParams.set(AJC1_LOGIN_ACTION_PARAM, 'damaged');
+        liff.login({ redirectUri: redirectUrl.toString() });
+      } catch (error) {
+        console.error('AJC1 LINE Login error:', error);
+        alert('ไม่สามารถเปิดหน้าเข้าสู่ระบบ LINE ได้ กรุณาลองใหม่อีกครั้ง');
+      }
       return;
     }
+
     sessionStorage.setItem(AJC1_LINE_USER_KEY, userId);
     location.href = MENU4_URL;
     return;
@@ -294,7 +345,7 @@ async function submitDepartmentChange(event){
   }
 }
 function submitPrototypeForm(event){event.preventDefault();showToast('ตรวจสอบข้อมูลแล้ว แต่ยังไม่บันทึก เนื่องจากยังไม่เชื่อมต่อ API')}
-function showToast(t){const e=document.getElementById('toast');e.textContent=t;e.classList.add('show');clearTimeout(window.tt);window.tt=setTimeout(()=>e.classList.remove('show'),2200)}
+function showToast(t){const e=document.getElementById('toast');if(!e){alert(t);return;}e.textContent=t;e.classList.add('show');clearTimeout(window.tt);window.tt=setTimeout(()=>e.classList.remove('show'),2200)}
 const d=new Date();document.getElementById('date').textContent=d.toLocaleDateString('th-TH',{day:'numeric',month:'long',year:'numeric'});
 </script>
 </body>
