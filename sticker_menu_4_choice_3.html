@@ -2262,19 +2262,36 @@ async function getAJC1LineUserId() {
                 required>
         </div>
 
-        <div class="form-group">
-            <label>ตำแหน่งผู้ตรวจสอบ <span style="color:red;">*</span></label>
-            <input
-                type="text"
-                id="inspectorPosition"
-                placeholder="เช่น หัวหน้าแผนก / ผู้อำนวยการกอง / ผู้อำนวยการฝ่าย"
-                required>
-            <div class="field-hint">
-                ระบุตำแหน่งตามหน่วยงานที่ปรากฏในช่อง “แผนก”
-                เช่น ผ. = หัวหน้าแผนก / ก. = ผู้อำนวยการกอง / ฝ. = ผู้อำนวยการฝ่าย
-            </div>
-        </div>
+        
+<div class="form-group">
+    <label>ตำแหน่งผู้ตรวจสอบ <span style="color:red;">*</span></label>
 
+    <select id="inspectorPosition" required>
+        <option value="" disabled selected>-- กรุณาเลือกตำแหน่ง --</option>
+
+        <option value="หัวหน้าแผนก">หัวหน้าแผนก</option>
+        <option value="รักษาการหัวหน้าแผนก">รักษาการหัวหน้าแผนก</option>
+        <option value="รักษาการในตำแหน่งหัวหน้าแผนก">รักษาการในตำแหน่งหัวหน้าแผนก</option>
+
+        <option value="ผู้อำนวยการกอง">ผู้อำนวยการกอง</option>
+        <option value="รักษาการผู้อำนวยการ">รักษาการผู้อำนวยการ</option>
+        <option value="รักษาการในตำแหน่งผู้อำนวยการกอง">รักษาการในตำแหน่งผู้อำนวยการกอง</option>
+
+        <option value="ผู้อำนวยการฝ่าย">ผู้อำนวยการฝ่าย</option>
+        <option value="รักษาการในตำแหน่งผู้อำนวยการฝ่าย">รักษาการในตำแหน่งผู้อำนวยการฝ่าย</option>
+        <option value="รักษาการผู้อำนวยการฝ่าย">รักษาการผู้อำนวยการฝ่าย</option>
+
+        <option value="รองผู้อำนวยการฝ่าย">รองผู้อำนวยการฝ่าย</option>
+        <option value="รักษาการในตำแหน่งรองผู้อำนวยการฝ่าย">รักษาการในตำแหน่งรองผู้อำนวยการฝ่าย</option>
+		<option value="รักษาการรองผู้อำนวยการฝ่าย">รักษาการในตำแหน่งรองผู้อำนวยการฝ่าย</option>
+
+        <option value="ผู้เชี่ยวชาญพิเศษ">ผู้เชี่ยวชาญพิเศษ</option>
+    </select>
+
+    <div class="field-hint">
+        กรุณาเลือกตำแหน่งตามหน่วยงานที่ปรากฏในช่อง “แผนก”
+    </div>
+</div>
         <div class="form-group">
             <label>วันที่ตรวจสอบ <span style="color:red;">*</span></label>
             <input
@@ -2736,7 +2753,7 @@ async function getAJC1LineUserId() {
         <textarea
           id="barcodeReason"
           rows="4"
-          placeholder="เช่น สติ๊กเกอร์เดิมชำรุด หลุด อ่านบาร์โค้ดไม่ได้ หรือรายละเอียดอื่น ๆ"></textarea>
+          placeholder="กรณีเลือกสภาพทรัพย์สิน อื่นๆ "></textarea>
       </div>
 
     </div>
